@@ -1,11 +1,15 @@
 const sequelize = require('../config/connection')
-const User = require('../models/User')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+
+//Load models
+const User = require('../models/User')
+const Customer = require('../models/Customer')
 
 //Load input validation
 const validateRegisterInput = require('../validation/register')
 const validateLoginInput = require('../validation/login')
+const validateCustomerRegisterInput = require('../validation/customerRegistraion')
 
 const register = (req, res) => {
     const { errors, isValid } = validateRegisterInput(req.body)
@@ -74,7 +78,25 @@ const login = (req, res) => {
     }
 }
 
+const customerRegistraion  = (req, res) => {
+    const { errors, isValid } = validateCustomerRegisterInput(req.body)
+
+    if(!isValid) {
+        res.status(400).json(errors)
+    } else {
+        Customer.create({
+            firstname: req.body.firstname,
+            lastname: req.body.lastname,
+            address: req.body.address,
+            postcode: req.body.postcode,
+            mobile: req.body.mobile
+        }).then(customer => res.status(200).json(customer))
+            .catch(error => console.log(error))
+    }
+}
+
 module.exports = { 
     register,
-    login
+    login,
+    customerRegistraion
 }
